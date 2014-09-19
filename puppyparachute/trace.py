@@ -6,8 +6,8 @@ import yaml
 from .utils import (
     stable_hash,
     strong_hash,
-    diff_dict,
 )
+from .diff_utils import diff_dict
 
 from .store import (
     newFunctionsDB,

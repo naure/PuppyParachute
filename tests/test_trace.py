@@ -2,7 +2,8 @@
 import sys
 import unittest
 from puppyparachute.trace import trace
-from puppyparachute.store import format_db, diff_db
+from puppyparachute.store import format_db
+from puppyparachute.tools import diff_db, smart_diff_db
 
 
 def main():
@@ -76,6 +77,12 @@ class Test(unittest.TestCase):
         self.assertEqual(len(fndb2), main2_fn_count)
         self.assertEqual(list(fndb1.keys()), list(fndb2.keys()))
         self.assertNotEqual(fndb1, fndb2)
+
+    def test_smart_diff(self):
+        fndb1, ret1 = trace(main1, [], trace_all=True)
+        fndb2, ret2 = trace(main2, [], trace_all=True)
+
+        print(smart_diff_db(fndb1, fndb2))
 
     def test_settrace(self):
         previous = sys.gettrace()

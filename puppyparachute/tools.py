@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import os
+import yaml
+from difflib import ndiff
 
 from .trace import (
     start_trace, stop_trace,
@@ -7,7 +9,31 @@ from .trace import (
 from .store import (
     newFunctionsDB, format_db,
 )
-from .diff_utils import udiff, red
+from .diff_utils import (
+    udiff, red, color_diffline, diff_dict,
+)
+
+
+def find_changes(dba, dbb):
+    return diff_dict(
+        dba,
+        dbb,
+        lambda a, b: a == b and 'Same' or 'Changed'
+    )
+
+def smart_diff_db(dba, dbb):
+    return yaml.dump(
+        find_changes(dba, dbb),
+        default_flow_style=False,
+    )
+
+
+def diff_db(db1, db2):
+    s1 = format_db(db1)
+    s2 = format_db(db2)
+    difflines = ndiff(s1.splitlines(), s2.splitlines())
+    colorlines = map(color_diffline, difflines)
+    return '\n'.join(colorlines)
 
 
 class TracingContext(object):

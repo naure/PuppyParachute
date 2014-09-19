@@ -1,12 +1,8 @@
 
 from collections import defaultdict, namedtuple
-from difflib import ndiff
 import yaml
 
-from .utils import (
-    values_sorted_by_key,
-    color_diffline,
-)
+from .utils import values_sorted_by_key
 
 FunctionsDB = type('FunctionsDB', (defaultdict, ), {})
 Function = namedtuple('Function', ['calls'])
@@ -62,11 +58,3 @@ yaml.add_representer(Effect, Effect_repr)
 
 def format_db(db):
     return yaml.dump(db)
-
-
-def diff_db(db1, db2):
-    s1 = format_db(db1)
-    s2 = format_db(db2)
-    difflines = ndiff(s1.splitlines(), s2.splitlines())
-    colorlines = map(color_diffline, difflines)
-    return '\n'.join(colorlines)
