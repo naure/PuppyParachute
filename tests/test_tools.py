@@ -23,12 +23,11 @@ test_tools:f: !Function
   cardinality: Single parameter list
   parameters lists:
   - !Call
-    args: {x: Traced code}
+    args:
+      x: Traced code
     cardinality: Single possible effect
     effects list:
     - !Effect
-      calls_made: []
-      local_changes: null
       returns: TRACED CODE
 '''
 

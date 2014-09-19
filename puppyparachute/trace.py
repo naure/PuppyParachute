@@ -49,7 +49,7 @@ def hash_obj(s):
 
 def serialize(o):
     try:
-        s = yaml.dump(o)
+        s = yaml.dump(o, default_flow_style=False)
         if s.endswith('\n...\n'):
             return s[:-5]
         else:

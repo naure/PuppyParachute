@@ -48,7 +48,10 @@ def Call_repr(dumper, obj):
 
 def Effect_repr(dumper, obj):
     return dumper.represent_mapping(
-        '!Effect', obj.__dict__)
+        '!Effect', {
+            k: v for k, v in obj.__dict__.items()
+            if v
+        })
 
 yaml.add_representer(FunctionsDB, FunctionsDB_repr)
 yaml.add_representer(Function, Func_repr)
@@ -57,4 +60,4 @@ yaml.add_representer(Effect, Effect_repr)
 
 
 def format_db(db):
-    return yaml.dump(db)
+    return yaml.dump(db, default_flow_style=False)
