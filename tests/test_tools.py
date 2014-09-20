@@ -5,6 +5,7 @@ import sys
 if __name__ == '__main__':
     sys.path.append('.')
 
+from puppyparachute.store import load_db
 from puppyparachute.tools import tracing, check, checking, short_diff_db
 
 
@@ -22,7 +23,7 @@ def g(x):
 f3 = g
 
 
-f1_behavior = '''!FunctionsDB
+f1_behavior = '''!TestRun
 test_tools:f:
   cardinality: Single parameter list
   parameters lists:
@@ -36,6 +37,17 @@ test_tools:f:
 
 class Test(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        with open('test_check.yml', 'w') as fd:
+            fd.write(f1_behavior)
+
+    '''@classmethod
+    def tearDownClass(cls):
+        rm('test_check.yml')
+        rm('test_check-last.yml')
+    '''
+
     def test_with_tracing(self):
         with tracing(trace_all=True) as store:
             f('Traced code')
@@ -46,8 +58,6 @@ class Test(unittest.TestCase):
 
     def test_check_when_correct(self):
         # Write expected behavior like it's always been there
-        with open('test_check.yml', 'w') as fd:
-            fd.write(f1_behavior)
         # Clean up residues
         last_path = 'test_check-last.yml'
         rm(last_path)
@@ -75,11 +85,8 @@ class Test(unittest.TestCase):
         # Write the new behavior and tell us where
         self.assertIn(last_path, str(cm.exception))
         self.assertTrue(os.path.exists(last_path))
-        rm(last_path)
 
     def test_checking(self):
-        with open('test_check.yml', 'w') as fd:
-            fd.write(f1_behavior)
 
         def fake_trace(*args):
             return
@@ -95,6 +102,10 @@ class Test(unittest.TestCase):
         after_trace = sys.gettrace()
         sys.settrace(old_trace)
         self.assertEqual(after_trace, fake_trace)
+
+    def test_load_store(self):
+        store = load_db(open('test_check.yml'))
+        self.assertIn('test_tools:f', store)
 
     def test_short_diff(self):
         with tracing(trace_all=True) as store1:

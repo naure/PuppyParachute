@@ -4,13 +4,17 @@ import yaml
 
 from .utils import values_sorted_by_key, dictmap
 
+TAG = '!!tag:nau.re/puppyparachute,2014:'
+STORE_TAG = '!TestRun'
 
+# Runtime data structures. 'calls' and 'effects' will be
+# dict of sorting keys. Later they will be replaced by lists.
 FunctionsDB = type('FunctionsDB', (defaultdict, ), {})
 Function = namedtuple('Function', ['calls'])
 Call = namedtuple('Call', ['args', 'effects'])
 Effect = namedtuple('Effect', ['returns', 'local_changes', 'calls_made'])
 
-
+# Create the runtime structures. Link them using defaultdict
 def newFunctionsDB():
     return FunctionsDB(newFunction)
 
@@ -26,7 +30,7 @@ def FunctionsDB_freeze(obj):
     return dictmap(Func_freeze, obj)
 
 def FunctionsDB_repr(dumper, obj):
-    return dumper.represent_mapping('!FunctionsDB', FunctionsDB_freeze(obj))
+    return dumper.represent_mapping(STORE_TAG, FunctionsDB_freeze(obj))
 
 # Dumping a function
 def Func_freeze(obj):
@@ -99,3 +103,12 @@ freeze_db = FunctionsDB_freeze
 
 def format_db(db):
     return yaml.dump(db, default_flow_style=False)
+
+# Load back from file or string
+def Store_constructor(loader, node):
+    return loader.construct_mapping(node)
+
+yaml.add_constructor(STORE_TAG, Store_constructor)
+
+def load_db(s):
+    return yaml.load(s)
