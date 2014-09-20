@@ -5,7 +5,7 @@ import sys
 if __name__ == '__main__':
     sys.path.append('.')
 
-from puppyparachute.tools import tracing, check, checking
+from puppyparachute.tools import tracing, check, checking, short_diff_db
 
 
 # Define two versions of f with the same name
@@ -16,6 +16,10 @@ f1 = f
 def f(x):
     return x.lower()
 f2 = f
+
+def g(x):
+    return x.split()[0]
+f3 = g
 
 
 f1_behavior = '''!FunctionsDB
@@ -93,6 +97,29 @@ class Test(unittest.TestCase):
         after_trace = sys.gettrace()
         sys.settrace(old_trace)
         self.assertEqual(after_trace, fake_trace)
+
+    def test_short_diff(self):
+        with tracing(trace_all=True) as store1:
+            f1('Traced code')
+        with tracing(trace_all=True) as store2:
+            f2('Traced code')
+        with tracing(trace_all=True) as store3:
+            f3('Traced code')
+        self.assertEqual(
+            short_diff_db(store1, store1), '')
+        self.assertEqual(
+            short_diff_db(store1, store2),
+            ' test_tools:f: x=Traced code -> traced code',
+        )
+        self.assertEqual(
+            short_diff_db(store1, store2),
+            ' test_tools:f: x=Traced code -> traced code',
+        )
+        self.assertEqual(
+            short_diff_db(store1, store3),
+            '-test_tools:f: x=Traced code -> TRACED CODE\n'
+            '+test_tools:g: x=Traced code -> Traced'
+        )
 
 
 def rm(path):

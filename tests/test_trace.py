@@ -78,12 +78,6 @@ class Test(unittest.TestCase):
         self.assertEqual(list(fndb1.keys()), list(fndb2.keys()))
         self.assertNotEqual(fndb1, fndb2)
 
-    def test_short_diff(self):
-        fndb1, ret1 = trace(main1, [], trace_all=True)
-        fndb2, ret2 = trace(main2, [], trace_all=True)
-
-        print(short_diff_db(fndb1, fndb2))
-
     def test_settrace(self):
         previous = sys.gettrace()
 
