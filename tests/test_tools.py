@@ -23,16 +23,14 @@ f3 = g
 
 
 f1_behavior = '''!FunctionsDB
-test_tools:f: !Function
+test_tools:f:
   cardinality: Single parameter list
   parameters lists:
-  - !Call
-    args:
+  - args:
       x: Traced code
     cardinality: Single possible effect
     effects list:
-    - !Effect
-      returns: TRACED CODE
+    - returns: TRACED CODE
 '''
 
 

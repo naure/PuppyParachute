@@ -14,6 +14,12 @@ def strong_hash(s, l=6):
 def values_sorted_by_key(d):
     return [val for key, val in sorted(d.items())]
 
+def dictmap(f, d):
+    return {
+        k: f(v)
+        for k, v in d.items()
+    }
+
 def truncate(s, size=80):
     " Truncate the middle of a string if it's too long "
     ls = len(s)
