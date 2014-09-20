@@ -80,6 +80,7 @@ def find_local_changes(call_frame):
     old_snap = call_frame.lsnap
     # Take a snapshot of the same objects to see if they have changed
     new_snap = snapshot_dict(call_frame.lvars, old_snap.keys())
+    # XXX Can use a better diff function
     return diff_dict(old_snap, new_snap)
 
 

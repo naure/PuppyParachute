@@ -15,14 +15,17 @@ re_yaml_tag = re.compile(r'!!python/[^:]*:')
 def remove_tags(s):
     return re_yaml_tag.sub('', s)
 
+def format_args(args):
+    return ', '.join('%s=%s' % item for item in args.items())
+
 def format_fn(fn):
     call = next(iter(fn.calls.values()))  # First call example
     effect = next(iter(call.effects.values()))  # First known effect
-    return remove_tags('{} -> {}{}{}'.format(
-        call.args,
+    return remove_tags('{} -> {}{}'.format(
+        format_args(call.args),
         effect.returns,
-        ' | ' if effect.local_changes else '',
-        effect.local_changes or '',
+        ' | ' + format_args(effect.local_changes)
+        if effect.local_changes else '',
     ))
 
 def annotate(store, filename):

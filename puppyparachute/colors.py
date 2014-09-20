@@ -1,4 +1,5 @@
 import sys
+import re
 
 # Optional colored output
 if sys.stdout.isatty():
@@ -26,9 +27,14 @@ if sys.stdout.isatty():
 
     def red(s):
         return color(s, '\033[91m')
+
+    re_restore = re.compile(r'\\+e(\\\s*)?\[')
+
+    def restore_colors(s):
+        ' Unescape terminal control codes in yaml to display colors '
+        return re_restore.sub('\033[', s)
+
 else:
     # No colored output
-    def nocolor(s):
-        return s
-
-    gray = blue = green = orange = red = color = nocolor
+    color = lambda s, c: s
+    gray = blue = green = orange = red = restore_colors = lambda s: s

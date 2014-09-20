@@ -22,6 +22,17 @@ def diff_dict(d1, d2, diff_fn=diff_plus):
             diffs[key] = diff
     return diffs
 
+def compare_dict(da, db):
+    " Find identical, changed, added, removed elements in dicts "
+    sa = set(da)
+    sb = set(db)
+    common = sa.intersection(sb)
+    changed = set(filter((lambda k: da[k] != db[k]), common))
+    stayed = common - changed
+    inserted = sb - sa
+    removed = sa - sb
+    return stayed, inserted, removed, changed
+
 def diff_obj(d1, d2):
     if d1 == d2:
         return None
@@ -35,11 +46,14 @@ def diff_obj(d1, d2):
         ))
 
 def color_diffline(line):
-    if line.startswith('- '):
+    if line.startswith('-'):
         return red(line)
-    if line.startswith('+ '):
+    if line.startswith('+'):
         return green(line)
     return line
+
+def color_number(n):
+    return color_diffline('%+d' % n) if n else '0'
 
 def udiff(a, b, **kwargs):
     return '\n'.join(map(

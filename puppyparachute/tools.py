@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os
-import yaml
 from difflib import ndiff
 
 from .trace import (
@@ -10,22 +9,25 @@ from .store import (
     newFunctionsDB, format_db,
 )
 from .diff_utils import (
-    udiff, red, color_diffline, diff_dict,
+    udiff, color_diffline, compare_dict
 )
+from .utils import truncate
+from .colors import green, red, orange
+from .annotate import format_fn
 
 
-def find_changes(dba, dbb):
-    return diff_dict(
-        dba,
-        dbb,
-        lambda a, b: a == b and 'Same' or 'Changed'
-    )
+def cmp_db(dba, dbb):
+    stayed, inserted, removed, changed = compare_dict(dba, dbb)
+    for k in removed:
+        yield '{}: {}'.format(red('-' + k), truncate(format_fn(dba[k])))
+    for k in inserted:
+        yield '{}: {}'.format(green('+' + k), truncate(format_fn(dbb[k])))
+    for k in changed:
+        yield ' {}: {}'.format(orange(k), truncate(format_fn(dbb[k])))
 
-def smart_diff_db(dba, dbb):
-    return yaml.dump(
-        find_changes(dba, dbb),
-        default_flow_style=False,
-    )
+
+def short_diff_db(a, b):
+    return '\n'.join(cmp_db(a, b))
 
 
 def diff_db(db1, db2):

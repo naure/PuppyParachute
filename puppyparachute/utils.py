@@ -13,3 +13,16 @@ def strong_hash(s, l=6):
 
 def values_sorted_by_key(d):
     return [val for key, val in sorted(d.items())]
+
+def truncate(s, size=80):
+    " Truncate the middle of a string if it's too long "
+    ls = len(s)
+    if ls <= size:
+        return s
+    else:
+        lend = size // 3
+        lstart = size - 3 - lend
+        return '{}...{}'.format(
+            s[:lstart],
+            s[-lend:],
+        )

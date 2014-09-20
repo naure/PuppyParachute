@@ -46,18 +46,18 @@ class Test(unittest.TestCase):
         polluted = False
         with open(afile) as fd:
             for line in fd:
-                if "{'x': " + "'Traced code'}" in line:
+                if "x=" + "Traced code" in line:
                     found_f = True
-                if "'y': " + "'Yyy'" in line:
+                if "y=" + "Yyy" in line:
                     found_inner = True
                 if (
-                    "'self': " + "'" in line and
-                    "'a': " + "'X'" in line
+                    "self" + "=" in line and
+                    "a=" + "X" in line
                 ):
                     found_method = True
-                if "'what': " + "'Aaa'" in line:
+                if "what=" + "Aaa" in line:
                     found_method_inner = True
-                if r"'self': " + r"'test_annotate.C {attr: X}'" in line:
+                if r"self=" + r"test_annotate.C {attr: X}" in line:
                     found_local_change = True
                 if "!!" + "python" in line:
                     polluted = True
