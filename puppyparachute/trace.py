@@ -49,7 +49,7 @@ def hash_obj(s):
 
 def serialize(o):
     try:
-        s = yaml.dump(o, default_flow_style=False)
+        s = yaml.dump(o, default_flow_style=True)
         if s.endswith('\n...\n'):
             return s[:-5]
         else:
@@ -92,6 +92,7 @@ def make_tracer(fndb, trace_all=False):
 
             call_frame = call_stack.pop()
             local_changes = find_local_changes(call_frame)
+            returns = None if ret_value is None else serialize(ret_value)
 
             func = fndb[fnid(frame)]
             args = call_frame.lsnap
@@ -99,9 +100,9 @@ def make_tracer(fndb, trace_all=False):
             call = func.calls[args_id]
 
             effect = Effect(
-                returns=serialize(ret_value),
+                returns=returns,
                 local_changes=local_changes or None,
-                calls_made=call_frame.calls_made,
+                calls_made=call_frame.calls_made or None,
             )
             effect_id = hash_call_effect(effect)
 

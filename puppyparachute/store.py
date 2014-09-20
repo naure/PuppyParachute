@@ -47,11 +47,25 @@ def Call_repr(dumper, obj):
          })
 
 def Effect_repr(dumper, obj):
-    return dumper.represent_mapping(
-        '!Effect', {
-            k: v for k, v in obj.__dict__.items()
-            if v
-        })
+    ' Custom dump, avoid empty items, use flow style for calls_made '
+    values = []
+    if obj.local_changes is not None:
+        values.append((
+            dumper.represent_str('local_changes'),
+            dumper.represent_dict(obj.local_changes),
+        ))
+    if obj.calls_made is not None:
+        values.append((
+            dumper.represent_str('calls_made'),
+            dumper.represent_sequence(
+                'tag:yaml.org,2002:seq', obj.calls_made, True),
+        ))
+    if obj.returns is not None:
+        values.append((
+            dumper.represent_str('returns'),
+            dumper.represent_str(obj.returns),
+        ))
+    return yaml.MappingNode('!Effect', values)
 
 yaml.add_representer(FunctionsDB, FunctionsDB_repr)
 yaml.add_representer(Function, Func_repr)

@@ -57,7 +57,7 @@ class Test(unittest.TestCase):
                     found_method = True
                 if "'what': " + "'Aaa'" in line:
                     found_method_inner = True
-                if r"'self': " + r"'test_annotate.C\nattr: X'" in line:
+                if r"'self': " + r"'test_annotate.C {attr: X}'" in line:
                     found_local_change = True
                 if "!!" + "python" in line:
                     polluted = True
