@@ -19,10 +19,10 @@ def format_args(args):
     return ', '.join('%s=%s' % item for item in args.items())
 
 def format_fn(fn):
-    call = next(iter(fn.calls.values()))  # First call example
-    effect = next(iter(call.effects.values()))  # First known effect
+    call = fn['parameters lists'][0]  # First call example
+    effect = call['effects list'][0]  # First known effect
     return remove_tags('{} -> {}{}'.format(
-        format_args(call.args),
+        format_args(call['args']),
         effect.returns,
         ' | ' + format_args(effect.local_changes)
         if effect.local_changes else '',
@@ -54,7 +54,7 @@ def annotate(store, filename):
                     qname = defname
                 fn = fns.get(qname)
                 if fn:
-                    out_fd.write('{}## {}\n'.format(
+                    out_fd.write('{}#? {}\n'.format(
                         indent,
                         format_fn(fn),
                     ))

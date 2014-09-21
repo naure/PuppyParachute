@@ -5,6 +5,7 @@ import sys
 if __name__ == '__main__':
     sys.path.append('.')
 
+from puppyparachute.store import freeze_db
 from puppyparachute.tools import tracing
 from puppyparachute.annotate import annotate
 
@@ -30,12 +31,15 @@ class C(object):
 class Test(unittest.TestCase):
 
     def test_annotate(self):
-        with tracing(trace_all=True) as store:
+        with tracing(trace_all=True) as fndb:
             f('Traced code')
 
+        store = freeze_db(fndb)
         afile = '{}-traced.py'.format(__file__)
         rm(afile)
+
         annotate(store, __file__)
+
         self.assertTrue(os.path.exists(afile))
         print(open(afile).read())
         found_f = False

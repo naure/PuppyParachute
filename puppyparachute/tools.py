@@ -81,8 +81,8 @@ def check(store_name, store):
         with open(test_path, 'w') as f:
             f.write(test_s)
 
-        #change = short_diff_db(ref_store, test_store)
-        change = diff_obj(ref_store, test_store)
+        change = short_diff_db(ref_store, test_store)
+        #change = diff_obj(ref_store, test_store)
         with open(last_change_path, 'w') as f:
             f.write(change)
 
@@ -97,11 +97,12 @@ def check(store_name, store):
 class CheckingContext(TracingContext):
     ' A context manager that combines tracing() and check() '
     def __init__(self, name, **kwargs):
-        tracing.__init__(self, **kwargs)
+        TracingContext.__init__(self, **kwargs)
         self.name = name
 
     def __exit__(self, *args):
-        tracing.__exit__(self, *args)
+        stop_trace(self.orig_trace)
+        #TracingContext.__exit__(self, *args)  # XXX?
         check(self.name, self.fndb)
         return False
 

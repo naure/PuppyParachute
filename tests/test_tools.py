@@ -5,7 +5,7 @@ import sys
 if __name__ == '__main__':
     sys.path.append('.')
 
-from puppyparachute.store import load_db
+from puppyparachute.store import load_db, freeze_db
 from puppyparachute.tools import tracing, check, checking, short_diff_db
 
 
@@ -102,6 +102,8 @@ class Test(unittest.TestCase):
         self.assertTrue(os.path.exists('test_check-last-change.txt'))
         with open('test_check-last-change.txt') as f:
             change = f.read()
+        change_lines = change.splitlines()
+        self.assertEqual(len(change_lines), 1)
         self.assertIn('test_tools:f', change)
 
         # It has put our trace function back
@@ -114,12 +116,15 @@ class Test(unittest.TestCase):
         self.assertIn('test_tools:f', store)
 
     def test_short_diff(self):
-        with tracing(trace_all=True) as store1:
+        with tracing(trace_all=True) as fndb1:
             f1('Traced code')
-        with tracing(trace_all=True) as store2:
+        with tracing(trace_all=True) as fndb2:
             f2('Traced code')
-        with tracing(trace_all=True) as store3:
+        with tracing(trace_all=True) as fndb3:
             f3('Traced code')
+        store1 = freeze_db(fndb1)
+        store2 = freeze_db(fndb2)
+        store3 = freeze_db(fndb3)
         self.assertEqual(
             short_diff_db(store1, store1), '')
         self.assertEqual(
