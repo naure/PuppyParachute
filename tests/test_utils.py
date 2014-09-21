@@ -10,6 +10,7 @@ def order(seq):
 
 class Test(unittest.TestCase):
     def test_stable_hash(self):
+        # XXX Not testing automatically
         phrases = [
             'Hé! 12',
             'Hé! 21',

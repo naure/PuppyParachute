@@ -28,17 +28,17 @@ main1_fn_count = 5
 
 class Test(unittest.TestCase):
 
-    @unittest.skip
     def test_dump_and_load(self):
         fndb, ret = trace(main1, [], trace_all=True)
         self.assertEqual(len(fndb), main1_fn_count)
 
         store = freeze_db(fndb)
-        dump = format_db(fndb)
-        load = load_db(dump)
+        dump = format_db(store)
+        dump_direct = format_db(fndb)
+        self.assertEqual(dump, dump_direct)
 
-        self.maxDiff = None
-        self.assertEqual(load, store)
+        loaded = load_db(dump)
+        self.assertDictEqual(loaded, store)
 
 
 if __name__ == '__main__':

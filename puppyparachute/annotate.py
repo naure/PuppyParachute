@@ -19,10 +19,10 @@ def format_args(args):
     return ', '.join('%s=%s' % item for item in args.items())
 
 def format_fn(fn):
-    call = fn['parameters lists'][0]  # First call example
-    effect = call['effects list'][0]  # First known effect
+    call = fn.known_calls[0]  # First call example
+    effect = call.effects_list[0]  # First known effect
     return remove_tags('{} -> {}{}'.format(
-        format_args(call['args']),
+        format_args(call.arguments),
         effect.returns,
         ' | ' + format_args(effect.local_changes)
         if effect.local_changes else '',

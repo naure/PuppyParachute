@@ -32,3 +32,21 @@ def truncate(s, size=80):
             s[:lstart],
             s[-lend:],
         )
+
+def nice_name(attr):
+    return attr.replace('_', ' ').capitalize()
+
+def ugly_name(name):
+    return name.replace(' ', '_').lower()
+
+def nice_dict(d):
+    return {
+        nice_name(k): v
+        for k, v in d.items()
+    }
+
+def ugly_dict(d):
+    return {
+        ugly_name(k): v
+        for k, v in d.items()
+    }

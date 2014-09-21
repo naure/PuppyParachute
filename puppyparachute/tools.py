@@ -9,7 +9,7 @@ from .store import (
     newFunctionsDB, freeze_db, format_db, load_db
 )
 from .diff_utils import (
-    udiff, diff_obj, color_diffline, compare_dict
+    udiff, color_diffline, compare_dict
 )
 from .utils import truncate
 from .colors import green, red, orange
@@ -19,11 +19,11 @@ from .annotate import format_fn
 def cmp_db(dba, dbb):
     stayed, inserted, removed, changed = compare_dict(dba, dbb)
     for k in removed:
-        yield '{}: {}'.format(red('-' + k), truncate(format_fn(dba[k])))
+        yield '{}: {}'.format(red('- ' + k), truncate(format_fn(dba[k])))
     for k in inserted:
-        yield '{}: {}'.format(green('+' + k), truncate(format_fn(dbb[k])))
+        yield '{}: {}'.format(green('+ ' + k), truncate(format_fn(dbb[k])))
     for k in changed:
-        yield ' {}: {}'.format(orange(k), truncate(format_fn(dbb[k])))
+        yield '{}: {}'.format(orange('! ' + k), truncate(format_fn(dbb[k])))
 
 
 def short_diff_db(a, b):

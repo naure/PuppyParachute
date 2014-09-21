@@ -94,7 +94,7 @@ def make_tracer(fndb, trace_all=False):
             # XXX Ugly scope and immutability hacks; find a better way
             effect = last_return_effect[0]
             if effect:
-                effect.exception.append(serialize(ret_value[1]))
+                effect.exception = serialize(ret_value[1])
                 last_return_effect[0] = None
 
         elif event == 'return':
@@ -110,7 +110,7 @@ def make_tracer(fndb, trace_all=False):
 
             effect = Effect(
                 calls_made=call_frame.calls_made or None,
-                exception=[],
+                exception=None,
                 local_changes=local_changes or None,
                 returns=returns,
             )
@@ -164,10 +164,10 @@ def trace(fn, fn_args=[], fn_kwargs={}, fndb=None, **kwargs):
         fndb = newFunctionsDB()
 
     orig_trace = start_trace(fndb, **kwargs)
-    try:
-        ret = fn(*fn_args, **fn_kwargs)  # Run it!
-    except Exception as exc:
-        # XXX Determine if error is in user 'fn' or in trace code
-        ret = exc
+    #try:
+    ret = fn(*fn_args, **fn_kwargs)  # Run it!
+    #except Exception as exc:
+    #    # XXX Determine if error is in user 'fn' or in trace code
+    #    ret = exc
     stop_trace(orig_trace)
     return fndb, ret

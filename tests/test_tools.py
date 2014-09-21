@@ -23,15 +23,17 @@ def g(x):
 f3 = g
 
 
-f1_behavior = '''!TestRun
-test_tools:f:
-  cardinality: Single parameter list
-  parameters lists:
-  - args:
+f1_behavior = '''!RunStore
+test_tools:f: !Function
+  Cardinality: Single parameter list
+  Known calls:
+  - !Call
+    Arguments:
       x: Traced code
-    cardinality: Single possible effect
-    effects list:
-    - returns: TRACED CODE
+    Cardinality: Single possible effect
+    Effects list:
+    - !Effect
+      Returns: TRACED CODE
 '''
 
 
@@ -47,6 +49,9 @@ class Test(unittest.TestCase):
         rm('test_check.yml')
         rm('test_check-last.yml')
     '''
+
+    def setUp(self):
+        sys.settrace(None)
 
     def test_with_tracing(self):
         with tracing(trace_all=True) as store:
@@ -105,6 +110,7 @@ class Test(unittest.TestCase):
         change_lines = change.splitlines()
         self.assertEqual(len(change_lines), 1)
         self.assertIn('test_tools:f', change)
+        self.assertEqual(change[0], '!')
 
         # It has put our trace function back
         after_trace = sys.gettrace()
@@ -113,6 +119,7 @@ class Test(unittest.TestCase):
 
     def test_load_store(self):
         store = load_db(open('test_check.yml'))
+        #import IPython; IPython.embed()
         self.assertIn('test_tools:f', store)
 
     def test_short_diff(self):
@@ -129,16 +136,12 @@ class Test(unittest.TestCase):
             short_diff_db(store1, store1), '')
         self.assertEqual(
             short_diff_db(store1, store2),
-            ' test_tools:f: x=Traced code -> traced code',
-        )
-        self.assertEqual(
-            short_diff_db(store1, store2),
-            ' test_tools:f: x=Traced code -> traced code',
+            '! test_tools:f: x=Traced code -> traced code',
         )
         self.assertEqual(
             short_diff_db(store1, store3),
-            '-test_tools:f: x=Traced code -> TRACED CODE\n'
-            '+test_tools:g: x=Traced code -> Traced'
+            '- test_tools:f: x=Traced code -> TRACED CODE\n'
+            '+ test_tools:g: x=Traced code -> Traced'
         )
 
 
