@@ -5,7 +5,7 @@ import sys
 if __name__ == '__main__':
     sys.path.append('.')
 
-from puppyparachute.store import freeze_db, format_db, load_db
+from puppyparachute.store import format_db, load_db
 from puppyparachute.tools import tracing
 from puppyparachute.annotate import annotate
 
@@ -29,6 +29,13 @@ class C(object):
 
 
 class Test(unittest.TestCase):
+
+    def some_entry_point(self):
+        ' Record a trace in a file '
+        with tracing(trace_all=True) as fndb:
+            f('Traced code')
+        with open('some_entry_point.yml', 'w') as fd:
+            fd.write(format_db(fndb))
 
     def test_annotate(self):
         with tracing(trace_all=True) as fndb:
@@ -64,7 +71,7 @@ class Test(unittest.TestCase):
                     found_method = True
                 if "what=" + "Aaa" in line:
                     found_method_inner = True
-                if r"self=" + r"test_annotate.C {attr: X}" in line:
+                if r"self=" in line and r".C {attr: X}" in line:
                     found_local_change = True
                 if "!!" + "python" in line:
                     polluted = True

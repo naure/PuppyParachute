@@ -33,7 +33,7 @@ def annotate(store, filename):
     fns = {}
     for qualname, fn in store.items():
         modname, fname = split_fnid(qualname)
-        if dottedfile.endswith(modname):
+        if dottedfile.endswith(modname) or modname == '__main__':
             fns[fname] = fn
 
     outfile = '{}-traced.py'.format(filename)

@@ -1,0 +1,17 @@
+#!yap
+
+if not ($1 and $2 and $3):
+    print("Run with:")
+    print("yap annotate.yp tests/test_annotate.py:Test.some_entry_point some_entry_point.yml tests/test_annotate.py")
+    exit(1)
+
+from puppyparachute.annotate import annotate
+from puppyparachute.store import load_db
+
+_ = O! nosetests3 $1
+
+store = load_db(open($2))
+file = $3
+annotate(store, file)
+
+! grep \? -A1 $3-traced.py
