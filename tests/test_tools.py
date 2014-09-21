@@ -95,8 +95,14 @@ class Test(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             # We know f1's behavior but we run f2, raise attention on it
-            with checking(name='test_f', trace_all=True):
+            with checking(name='test_check', trace_all=True):
                 f2('Traced code')
+
+        # It has created a summary file
+        self.assertTrue(os.path.exists('test_check-last-change.txt'))
+        with open('test_check-last-change.txt') as f:
+            change = f.read()
+        self.assertIn('test_tools:f', change)
 
         # It has put our trace function back
         after_trace = sys.gettrace()

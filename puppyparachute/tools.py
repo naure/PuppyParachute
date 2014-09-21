@@ -6,10 +6,10 @@ from .trace import (
     start_trace, stop_trace,
 )
 from .store import (
-    newFunctionsDB, format_db,
+    newFunctionsDB, freeze_db, format_db, load_db
 )
 from .diff_utils import (
-    udiff, color_diffline, compare_dict
+    udiff, diff_obj, color_diffline, compare_dict
 )
 from .utils import truncate
 from .colors import green, red, orange
@@ -58,11 +58,19 @@ class TracingContext(object):
 def check(store_name, store):
     ' Load `store_name` and compare it to `store` '
     test_s = format_db(store)
+    test_store = freeze_db(store)
     test_path = '{}-last.yml'.format(store_name)
+    last_change_path = '{}-last-change.txt'.format(store_name)
 
     ref_path = '{}.yml'.format(store_name)
     if not os.path.exists(ref_path):
         open(ref_path, 'w').close()
+        ref_s = ''
+        ref_store = {}
+    else:
+        with open(ref_path) as f:
+            ref_s = f.read()
+        ref_store = load_db(ref_s)
 
     with open(ref_path) as f:
         ref_s = f.read()
@@ -72,6 +80,12 @@ def check(store_name, store):
         print(diff)
         with open(test_path, 'w') as f:
             f.write(test_s)
+
+        #change = short_diff_db(ref_store, test_store)
+        change = diff_obj(ref_store, test_store)
+        with open(last_change_path, 'w') as f:
+            f.write(change)
+
         raise AssertionError(red(
             'Behavior {} has changed. '
             'Check the diff. If it looks like what you are trying to do, '
