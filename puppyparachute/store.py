@@ -12,7 +12,8 @@ STORE_TAG = '!TestRun'
 FunctionsDB = type('FunctionsDB', (defaultdict, ), {})
 Function = namedtuple('Function', ['calls'])
 Call = namedtuple('Call', ['args', 'effects'])
-Effect = namedtuple('Effect', ['returns', 'local_changes', 'calls_made'])
+Effect = namedtuple('Effect', [
+    'returns', 'local_changes', 'calls_made', 'exception'])
 
 # Create the runtime structures. Link them using defaultdict
 def newFunctionsDB():
@@ -81,6 +82,11 @@ def Effect_repr(dumper, obj):
             dumper.represent_str('calls_made'),
             dumper.represent_sequence(
                 'tag:yaml.org,2002:seq', obj.calls_made, True),
+        ))
+    if obj.exception:
+        values.append((
+            dumper.represent_str('exception'),
+            dumper.represent_str(obj.exception[0]),
         ))
     if obj.local_changes is not None:
         values.append((

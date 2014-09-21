@@ -86,10 +86,18 @@ def find_local_changes(call_frame):
 
 def make_tracer(fndb, trace_all=False):
     call_stack = []
+    last_return_effect = [None]
 
     def trace_body(frame, event, ret_value):
 
-        if event == 'return':
+        if event == 'exception':
+            # XXX Ugly scope and immutability hacks; find a better way
+            effect = last_return_effect[0]
+            if effect:
+                effect.exception.append(serialize(ret_value[1]))
+                last_return_effect[0] = None
+
+        elif event == 'return':
 
             call_frame = call_stack.pop()
             local_changes = find_local_changes(call_frame)
@@ -101,14 +109,17 @@ def make_tracer(fndb, trace_all=False):
             call = func.calls[args_id]
 
             effect = Effect(
-                returns=returns,
-                local_changes=local_changes or None,
                 calls_made=call_frame.calls_made or None,
+                exception=[],
+                local_changes=local_changes or None,
+                returns=returns,
             )
             effect_id = hash_call_effect(effect)
 
             call.args.update(args)  # XXX Only the firts time, do differently
             call.effects[effect_id] = effect
+            # Keep track of it in case it has raised an exception
+            last_return_effect[0] = effect
 
         return trace_body
 
@@ -153,6 +164,10 @@ def trace(fn, fn_args=[], fn_kwargs={}, fndb=None, **kwargs):
         fndb = newFunctionsDB()
 
     orig_trace = start_trace(fndb, **kwargs)
-    ret = fn(*fn_args, **fn_kwargs)  # Run it!
+    try:
+        ret = fn(*fn_args, **fn_kwargs)  # Run it!
+    except Exception as exc:
+        # XXX Determine if error is in user 'fn' or in trace code
+        ret = exc
     stop_trace(orig_trace)
     return fndb, ret

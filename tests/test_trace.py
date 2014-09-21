@@ -3,7 +3,7 @@ import sys
 import unittest
 from puppyparachute.trace import trace
 from puppyparachute.store import format_db
-from puppyparachute.tools import diff_db, short_diff_db
+from puppyparachute.tools import diff_db
 
 
 def main():
@@ -59,6 +59,18 @@ main2 = main
 main2_fn_count = 5
 
 
+def main():
+    def f(s):
+        raise ValueError(s)
+    try:
+        f('Catch this error')
+    except:
+        pass
+
+main_exc = main
+main_exc_fn_count = 2
+
+
 class Test(unittest.TestCase):
 
     def test_dump(self):
@@ -66,6 +78,15 @@ class Test(unittest.TestCase):
         dump1 = format_db(fndb1)
         print(dump1)
         self.assertEqual(len(fndb1), main1_fn_count)
+
+    def test_exception(self):
+        fndbe, ret = trace(main_exc, [], trace_all=True)
+        dumpe = format_db(fndbe)
+        print(dumpe)
+        self.assertEqual(len(fndbe), main_exc_fn_count)
+        self.assertTrue(any(
+            'ValueError' in line and 'Catch this error' in line
+            for line in dumpe.splitlines()))
 
     def test_main(self):
         fndb1, ret1 = trace(main1, [], trace_all=True)
