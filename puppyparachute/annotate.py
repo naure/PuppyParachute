@@ -12,9 +12,13 @@ def module_from_file(filename):
 re_def = re.compile(r'([ ]*) (class|def) [ ]+ (\w+)', re.X)
 
 re_yaml_tag = re.compile(r'!!python/[^:]*:')
+re_yaml_module = re.compile(r'!!python/[^:]*:(\w+\.)*')
 
 def remove_tags(s):
     return re_yaml_tag.sub('', s)
+
+def remove_tags_module(s):
+    return re_yaml_module.sub('', s)
 
 def format_args(args):
     return ', '.join('%s=%s' % item for item in args.items())
@@ -22,7 +26,7 @@ def format_args(args):
 def format_fn(fn):
     call = fn.known_calls[0]  # First call example
     effect = call.effects_list[0]  # First known effect
-    return remove_tags('{} -> {}{}'.format(
+    return remove_tags_module('{} -> {}{}'.format(
         format_args(call.arguments),
         effect.returns,
         ' | ' + format_args(effect.local_changes)
