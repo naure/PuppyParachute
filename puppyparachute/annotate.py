@@ -1,5 +1,6 @@
 import os
 import re
+from itertools import filterfalse
 
 from .trace import split_fnid
 
@@ -28,7 +29,8 @@ def format_fn(fn):
         if effect.local_changes else '',
     ))
 
-def annotate(store, filename):
+# Annotating
+def annotate_s(store, lines, filename):
     dottedfile = module_from_file(filename)
     fns = {}
     for qualname, fn in store.items():
@@ -36,26 +38,53 @@ def annotate(store, filename):
         if dottedfile.endswith(modname) or modname == '__main__':
             fns[fname] = fn
 
-    outfile = '{}-traced.py'.format(filename)
-    with open(filename) as in_fd, open(outfile, 'w') as out_fd:
-        stack = []
+    stack = []
+    for line in filter_annotations(lines):
+        m = re_def.match(line)
+        if m:
+            indent, kw, defname = m.groups()
+            level = len(indent) // 4
+            stack = stack[:level]
+            if kw == 'class':
+                stack.append(defname)
+            if stack and len(stack) == level:  # Directly under a class
+                qname = '{}.{}'.format('.'.join(stack), defname)
+            else:
+                qname = defname
+            fn = fns.get(qname)
+            if fn:
+                yield '{}#? {}'.format(
+                    indent,
+                    format_fn(fn),
+                )
+        yield line
 
-        for line in in_fd:
-            m = re_def.match(line)
-            if m:
-                indent, kw, defname = m.groups()
-                level = len(indent) // 4
-                stack = stack[:level]
-                if kw == 'class':
-                    stack.append(defname)
-                if stack and len(stack) == level:  # Directly under a class
-                    qname = '{}.{}'.format('.'.join(stack), defname)
-                else:
-                    qname = defname
-                fn = fns.get(qname)
-                if fn:
-                    out_fd.write('{}#? {}\n'.format(
-                        indent,
-                        format_fn(fn),
-                    ))
-            out_fd.write(line)
+
+def annotate(store, infile, outfile=None):
+    ' Annotate `infile` using functions records in `store` '
+    if not outfile:
+        outfile = infile
+    with open(infile) as in_fd:
+        inlines = in_fd.read().splitlines()
+    outlines = annotate_s(store, inlines, infile)
+    with open(outfile, 'w') as out_fd:
+        out_fd.write('\n'.join(outlines))
+        out_fd.write('\n')
+
+# Deannotating
+re_annotation = re.compile(r'\s*#\?')
+
+def filter_annotations(lines):
+    ' Remove annotations from list of `lines` '
+    return filterfalse(re_annotation.match, lines)
+
+def deannotate(infile, outfile=None):
+    ' Remove annotations from `infile` '
+    if not outfile:
+        outfile = infile
+    with open(infile) as in_fd:
+        inlines = in_fd.read().splitlines()
+    outlines = filter_annotations(inlines)
+    with open(outfile, 'w') as out_fd:
+        out_fd.write('\n'.join(outlines))
+        out_fd.write('\n')
