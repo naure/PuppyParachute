@@ -1,22 +1,32 @@
 #!yap
+# vim: set ft=python:
+
+sys.path.insert(0, '.')
 
 from puppyparachute.annotate import annotate
-from puppyparachute.store import load_db
+from puppyparachute.store import freeze_db
+from puppyparachute.tools import import_by_name, tracing
 
-if not ($1 and $2 and $3):
+if not ($1 and $2):
     print("Run with:")
     print("yap annotate.yp tests/test_annotate.py:Test.some_entry_point some_entry_point.yml tests/test_annotate.py")
     exit(1)
 
 # Run the trace
-_ = O! nosetests3 $1
+#_ = O! nosetests3 $1
 
 # Load the trace records
-store = load_db(open($2))
+#store = load_db(open($2))
+
+# Import and trace a function
+entry_point = import_by_name($1)
+with tracing() as fndb:
+    entry_point()
+store = freeze_db(fndb)
 
 # Annotate the file
-file = $3
-out = $4 or file
+file = $2
+out = $3 or file
 annotate(store, file, out)
 
 # Display what has been annotated

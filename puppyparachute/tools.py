@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 from difflib import ndiff
+from importlib import import_module
 
 from .trace import (
     start_trace, stop_trace,
@@ -109,3 +110,13 @@ class CheckingContext(TracingContext):
 # Aliases for "with tracing() as db"
 tracing = TracingContext
 checking = CheckingContext
+
+
+# Running user code
+def import_by_name(name):
+    ' Import module.sub:obj.attr '
+    modname, objname = name.split(':')
+    obj = import_module(modname)
+    for attr in objname.split('.'):
+        obj = getattr(obj, attr)
+    return obj

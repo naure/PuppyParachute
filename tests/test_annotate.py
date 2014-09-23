@@ -27,10 +27,13 @@ class C(object):
 
         return inner('Aaa')
 
+def some_entry_point():
+    f('Some entry point')
+
 
 class Test(unittest.TestCase):
 
-    def some_entry_point(self):
+    def just_tracing(self):
         ' Record a trace in a file '
         with tracing(trace_all=True) as fndb:
             f('Traced code')

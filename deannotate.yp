@@ -1,5 +1,7 @@
 #!yap
 
+sys.path.insert(0, '.')
+
 from puppyparachute.annotate import deannotate
 
 if not ($1):
