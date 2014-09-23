@@ -9,6 +9,9 @@ def module_from_file(filename):
     assert filename[-3:] == '.py', 'Not a .py filename'
     return filename[:-3].replace(os.sep, '.')
 
+def file_from_module(module):
+    return module.replace('.', os.sep) + '.py'
+
 re_def = re.compile(r'([ ]*) (class|def) [ ]+ (\w+)', re.X)
 
 re_yaml_tag = re.compile(r'!!python/[^:]*:')

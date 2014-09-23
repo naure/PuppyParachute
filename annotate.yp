@@ -3,11 +3,12 @@
 
 sys.path.insert(0, '.')
 
-from puppyparachute.annotate import annotate
+from puppyparachute.annotate import annotate, split_fnid, file_from_module
 from puppyparachute.store import freeze_db
 from puppyparachute.tools import import_by_name, tracing
 
-if not ($1 and $2):
+
+if not ($1):
     print("Run with:")
     print("yap annotate.yp tests/test_annotate.py:Test.some_entry_point some_entry_point.yml tests/test_annotate.py")
     exit(1)
@@ -25,10 +26,24 @@ with tracing() as fndb:
 store = freeze_db(fndb)
 
 # Annotate the file
-file = $2
-out = $3 or file
-annotate(store, file, out)
+if $2:
+    files = [$2]
+    out = $3 or $2
+else:
+    files = set([
+        file_from_module(
+            split_fnid(qualname)[0])
+        for qualname in store
+    ])
+    out = None
 
-# Display what has been annotated
-! grep \? -A1 {out}
-print('Written to {}'.format(out))
+for f in files:
+    fout = out or f
+    annotate(store, f, fout)
+
+    # Display what has been annotated
+    ! grep \? -A1 {fout}
+    print('Written to {}'.format(fout))
+
+print('Processed {} files. Revert with:'.format(len(files)))
+print('yap deannotate.yp {}'.format(joinfields(files)))

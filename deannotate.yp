@@ -8,8 +8,8 @@ if not ($1):
     print("Usage: yap deannotate.yp annotated.py [deannotated.py]")
     exit(1)
 
-inp = $1
-out = $2 or inp
-deannotate(inp, out)
+files = $*[1:]
+for f in files:
+    deannotate(f)
 
-print('Written to {}'.format(out))
+print('Processed {}'.format(joinfields(files)))
