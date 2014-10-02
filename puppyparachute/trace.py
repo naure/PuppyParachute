@@ -84,7 +84,17 @@ def find_local_changes(call_frame):
     return diff_dict(old_snap, new_snap)
 
 
-def make_tracer(fndb, trace_all=False):
+def make_tracer(fndb, trace_all=False, packages=[]):
+
+    if not packages:
+        # Trace into any package
+        def should_trace(funcid):
+            return True
+    else:
+        # Trace only into selected packages, .modules, :classes
+        def should_trace(funcid):
+            return any(funcid.startswith(p) for p in packages)
+
     call_stack = []
     last_return_effect = [None]
 
@@ -127,8 +137,10 @@ def make_tracer(fndb, trace_all=False):
 
         filename = frame.f_code.co_filename
         funcname = frame.f_code.co_name
+        funcid = fnid(frame)
 
         if not trace_all and (
+            not should_trace(funcid) or
             filename.startswith('/') or
             filename.startswith('<') or
             funcname.startswith('<')

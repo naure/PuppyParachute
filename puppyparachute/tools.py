@@ -51,9 +51,18 @@ class TracingContext(object):
         self.orig_trace = start_trace(self.fndb, **self.kwargs)
         return self.fndb
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self, exc_type=None, exc_value=None, traceback=None):
         stop_trace(self.orig_trace)
         return False
+
+    start = __enter__
+    stop = __exit__
+
+    def freeze(self):
+        return freeze_db(self.fndb)
+
+    def dump(self, *args, **kwargs):
+        return format_db(self.fndb, *args, **kwargs)
 
 
 def check(store_name, store):
@@ -106,6 +115,8 @@ class CheckingContext(TracingContext):
         #TracingContext.__exit__(self, *args)  # XXX?
         check(self.name, self.fndb)
         return False
+
+    stop = __exit__
 
 # Aliases for "with tracing() as db"
 tracing = TracingContext

@@ -145,8 +145,10 @@ yaml.add_representer(FunctionsDB, FunctionsDB_repr)
 # Convenience functions
 freeze_db = FunctionsDB_freeze
 
-def format_db(db):
-    return yaml.dump(db, default_flow_style=False)
+def format_db(db, stream=None):
+    return yaml.dump(db, stream=stream, default_flow_style=False)
+
+dump_db = format_db
 
 def load_db(s):
     return yaml.load(s)
