@@ -31,14 +31,23 @@ class PuppyParachute(Plugin):
             '[NOSE_PUPPY_FILE or puppy_trace.yml]',
         )
 
+        parser.add_option(
+            '--puppy-annotate', action='store_true',
+            default=env.get('NOSE_PUPPY_ANNOTATE'),
+            help='Annotate source files.'
+            'Use puppy-deannotate to remove annotations',
+        )
+
     def configure(self, options, conf):
         super(PuppyParachute, self).configure(options, conf)
 
-        if any(opt.startswith('puppy_') for opt in vars(options)):
+        if options.puppy_packages:
             self.enabled = True
 
         if self.enabled:
             try:
+                import puppyparachute
+                self.puppyparachute = puppyparachute
                 from puppyparachute.tools import tracing
             except ImportError as e:
                 log.error('Could not import puppyparachute: {}'.format(e))
@@ -80,3 +89,10 @@ class PuppyParachute(Plugin):
 
         with open(self.conf.options.puppy_file, 'w') as fd:
             self.tracer.dump(fd)
+
+        if self.conf.options.puppy_annotate:
+            if self.conf.options.verbosity >= 2:
+                stream.write(
+                    'Annotating source files. '
+                    'Use puppy-deannotate to remove annotations\n')
+            self.puppyparachute.annotate.annotate_all(self.tracer.freeze())

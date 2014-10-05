@@ -3,7 +3,7 @@
 
 sys.path.insert(0, '.')
 
-from puppyparachute.annotate import annotate, split_fnid, file_from_module
+from puppyparachute.annotate import annotate, split_fnid, files_in_store
 from puppyparachute.store import freeze_db
 from puppyparachute.tools import import_by_name, tracing
 
@@ -30,11 +30,7 @@ if $2:
     files = [$2]
     out = $3 or $2
 else:
-    files = set([
-        file_from_module(
-            split_fnid(qualname)[0])
-        for qualname in store
-    ])
+    files = files_in_store(store)
     out = None
 
 for f in files:

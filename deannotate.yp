@@ -5,10 +5,10 @@ sys.path.insert(0, '.')
 from puppyparachute.annotate import deannotate
 
 if not ($1):
-    print("Usage: yap deannotate.yp annotated.py [deannotated.py]")
+    print("Usage: yap deannotate.yp annotated.py...")
     exit(1)
 
-files = $*[1:]
+files = $*
 for f in files:
     deannotate(f)
 

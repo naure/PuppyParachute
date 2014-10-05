@@ -78,6 +78,23 @@ def annotate(store, infile, outfile=None):
         out_fd.write('\n'.join(outlines))
         out_fd.write('\n')
 
+
+def annotate_all(store):
+    ' Annotate all files known in `store` '
+    for f in files_in_store(store):
+        annotate(store, f)
+
+
+def files_in_store(store):
+    ' Return all files known in `store` '
+    files = set([
+        file_from_module(
+            split_fnid(qualname)[0])
+        for qualname in store
+    ])
+    return files
+
+
 # Deannotating
 re_annotation = re.compile(r'\s*#\?')
 
