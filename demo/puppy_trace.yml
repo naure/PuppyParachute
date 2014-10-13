@@ -1,4 +1,28 @@
 !RunStore
+app:A.__init__: !Function
+  Cardinality: Single parameter list
+  Known calls:
+  - !Call
+    Arguments:
+      n: '10'
+      self: '!!python/object:app.A {}'
+    Cardinality: Single possible effect
+    Effects list:
+    - !Effect
+      Local changes:
+        self: '!!python/object:app.A {n: 10}'
+app:A.inc: !Function
+  Cardinality: Single parameter list
+  Known calls:
+  - !Call
+    Arguments:
+      i: '2'
+      self: '!!python/object:app.A {n: 10}'
+    Cardinality: Single possible effect
+    Effects list:
+    - !Effect
+      Local changes:
+        self: '!!python/object:app.A {n: 12}'
 app:do_things: !Function
   Cardinality: 3 known parameter lists
   Known calls:
@@ -31,5 +55,5 @@ app:main: !Function
     Cardinality: Single possible effect
     Effects list:
     - !Effect
-      Calls made: [do_things, do_things]
+      Calls made: [do_things, do_things, __init__, inc]
       Returns: Everything is alright
