@@ -1,0 +1,35 @@
+!RunStore
+app:do_things: !Function
+  Cardinality: 3 known parameter lists
+  Known calls:
+  - !Call
+    Arguments:
+      what: that
+    Cardinality: Single possible effect
+    Effects list:
+    - !Effect
+      Returns: Done
+  - !Call
+    Arguments:
+      what: this
+    Cardinality: Single possible effect
+    Effects list:
+    - !Effect
+      Returns: Done
+  - !Call
+    Arguments:
+      what: nothing
+    Cardinality: Single possible effect
+    Effects list:
+    - !Effect
+      Returns: Done
+app:main: !Function
+  Cardinality: Single parameter list
+  Known calls:
+  - !Call
+    Arguments: {}
+    Cardinality: Single possible effect
+    Effects list:
+    - !Effect
+      Calls made: [do_things, do_things]
+      Returns: Everything is alright
