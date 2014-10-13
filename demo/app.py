@@ -3,6 +3,8 @@
 #? what=that -> Done
 def do_things(what):
     print('Doing {}'.format(what))
+    if 'a' in what:
+        return 'Done something different'
     return 'Done'
 
 #?  -> Everything is alright

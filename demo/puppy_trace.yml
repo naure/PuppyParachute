@@ -8,7 +8,7 @@ app:do_things: !Function
     Cardinality: Single possible effect
     Effects list:
     - !Effect
-      Returns: Done
+      Returns: Done something different
   - !Call
     Arguments:
       what: this
