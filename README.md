@@ -6,6 +6,22 @@
     
 See example runtime values side-by-side with the code.
 
+Annotations can easily be generated from existing unittests
+using a nosetests plugin:
+
+    > nosetests3 demo --puppy-package app
+
+This will annotate all functions covered by the tests, including inputs and outputs, for instance:
+
+```python
+#? what=that -> Done
+def do_things(what):
+    print('Doing {}'.format(what))
+    return 'Done'
+```
+
+The #?-annotations can be removed using the deannotate script.
+
 ### Understand change
 
 See the effects of a change in all parts of the code.
@@ -13,6 +29,10 @@ See the effects of a change in all parts of the code.
 Inspect changes and accept them by simply copying a file.
 
 Track behavior changes in version control along with code changes.
+
+See an example code change, and the associated change at runtime
+in [this commit](commit/5532a66eef52b2798fd279748f830ff1f6ab0a79).
+
 
 ### Automatic regression tests
 
