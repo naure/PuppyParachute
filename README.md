@@ -11,7 +11,7 @@ using a nosetests plugin:
 
     > nosetests3 demo --puppy-package app --puppy-annotate
 
-This will annotate all functions covered by the tests, including inputs and outputs, for instance:
+This will annotate all functions covered by the tests, including example inputs and outputs, for instance:
 
 ```python
 #? what=that -> Done
