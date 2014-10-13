@@ -141,12 +141,10 @@ def make_tracer(fndb, trace_all=False, packages=[]):
 
         if not trace_all and (
             not should_trace(funcid) or
-            filename.startswith('/') or
             filename.startswith('<') or
             funcname.startswith('<')
         ):
             return  # Ignore built-in, library calls, generators, ..
-            # XXX Not very reliable
 
         if event == 'call':
             snapped_frame = snapshot_frame(frame)
